@@ -7,7 +7,7 @@ import testdata as td
 	= 			The Assignment operator
 	*			The bitwise exclusive-OR operation.
 	||			The concatenation of the two operands. (+ should also work)
-	E[x]k		The Result of applying a block cipher ebcryption to the input value x using the key k
+	E[x]k		The Result of applying a block cipher encryption to the input value x using the key k
 	rot(x,r) 	The result of cyclically rotating the 128-bit value x by r bit positions towards the most significant bit.
 	X[i]		the ith bit in the variable X.
 
@@ -31,6 +31,8 @@ import testdata as td
 	TEMP	a	128-bit value used in the computations of the functions
 '''
 
+def Ek():
+	pass
 
 def f1(K: bytes, RAND: bytes, SQN: bytes, AMF: bytes):	#Returns MAC-A (64-bits)
 	'''
@@ -92,12 +94,33 @@ def main() -> None:
 	SQN: bytes = test_data['SQN']
 	AMF: bytes = test_data['AMF']
 
+	#Other variables
+	OP: bytes = test_data['OP']
+	OPc: bytes = test_data['OPc']
+
 	#Define expected outputs
 	ex_out_f1: bytes = test_data['f1']
 	ex_out_f2: bytes = test_data['f2']
 	ex_out_f3: bytes = test_data['f3']
 	ex_out_f4: bytes = test_data['f4']
 	ex_out_f5: bytes = test_data['f5']
+
+	#Define Constants
+	r1: int = 64
+	r2: int = 0
+	r3: int = 32
+	r4: int = 64
+	r5: int = 96
+
+
+	#Unsure if these are in the correct format... fix later
+	c1: str = ""
+	for i in range(128):
+		c1 += "0"
+	c2: str = change_char(c1, "1", 127)
+	c3: str = change_char(c1, "1", 126)
+	c4: str = change_char(c1, "1", 125)
+	c5: str = change_char(c1, "1", 124)
 
 
 if __name__ == "__main__":
