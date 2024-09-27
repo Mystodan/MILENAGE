@@ -43,7 +43,7 @@ def old_xor(a: bytes, b: bytes) -> bytes:
     '''
     Takes in two variables: bytes and xor's them by 
     first converting them to int (basically binary)
-    ---
+    
     returns: bytes that have been xor'd
     '''
     return int.to_bytes(int.from_bytes(a)^int.from_bytes(b))
@@ -62,11 +62,11 @@ def xor(*args: bytes) -> bytes:
 def change_char(string: str, char: str, index: int) -> str:
     '''
     Changes char at index in a given string
-    ---
+    
     string: string to modify
     char: character to change to
     index: at which index to change the character
-    ---
+    
     returns: string with changed value
     '''
     assert (len(string) > index), "index must be within scope"
@@ -80,10 +80,44 @@ def change_char(string: str, char: str, index: int) -> str:
     return new_str
 
 
+def bit_str_to_bytes(string: str) -> bytes|int:
+	'''
+	Turns a string of bits into bytes. "101" -> b"\\x05".
+
+	Input string must consist of only 1s and 0s.
+	'''
+	out_int: int = 0
+	#Check is string only contains 1s and 0s
+	for i in range(len(string)):
+		if string[i] != "0" and string[i] != "1":
+			raise ValueError("input string must be in bit format")
+	for count, value in enumerate(string[::-1]):
+		out_int += int(value) * (2**count)
+	return int.to_bytes(out_int)
+
+
+def create_c() -> tuple:
+	'''
+	Creates all 5 c constants and returns them as a tuple, needs to be unpacked
+	'''
+	base_str: str = ""
+	for i in range(128):
+		base_str += "0"
+
+	c1: bytes = bit_str_to_bytes(base_str)
+	c2: bytes = bit_str_to_bytes(change_char(base_str, "1", 127))
+	c3: bytes = bit_str_to_bytes(change_char(base_str, "1", 126))
+	c4: bytes = bit_str_to_bytes(change_char(base_str, "1", 125))
+	c5: bytes = bit_str_to_bytes(change_char(base_str, "1", 124))
+
+	return c1, c2, c3, c4, c5
+	
+
+
+
 
 #For testing that the functions work
 if __name__ == '__main__':
 	bits: bytes = b"1234567890123456"
-	print(int.from_bytes(bits))
-	print(b2a(bits))
+	print(b2a(b"aaaaaaaaaaaaaaaa"))
 	

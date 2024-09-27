@@ -112,15 +112,7 @@ def main() -> None:
 	r4: int = 64
 	r5: int = 96
 
-
-	#Unsure if these are in the correct format... fix later
-	c1: str = ""
-	for i in range(128):
-		c1 += "0"
-	c2: str = change_char(c1, "1", 127)
-	c3: str = change_char(c1, "1", 126)
-	c4: str = change_char(c1, "1", 125)
-	c5: str = change_char(c1, "1", 124)
+	c1, c2, c3, c4, c5 = create_c()
 
 
 if __name__ == "__main__":
