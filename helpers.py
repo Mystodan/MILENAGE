@@ -28,9 +28,12 @@ def a2b(s: str) -> bytes:
 	return bytes(bytelist)
 
 
-#Something doesn't work here, don't know what. Copied from Milenage PowerPoint
+#Something doesn't work here, don't know what. Copied from Milenage PowerPoint 
+#bytes.decode("ascii") should work instead 
 def b2a(b: bytes) -> str:
-	'''Bytes to ascii. For 16 bytes objects only'''
+	'''
+	Bytes to ascii. For 16 bytes objects only
+	'''
 	print(len(b))
 	assert len(b) == 16
 	tmp = list()
