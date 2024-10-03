@@ -54,7 +54,7 @@ def f1(K: bytes, RAND: bytes, SQN: bytes, AMF: bytes):	#Returns MAC-A (64-bits)
 	ROPc : bytes = Ek(K, xor(OPc, RAND))
 	out : bytes = SQN + AMF + SQN + AMF
 	out : bytes = rot(xor(OPc, out), r1)
-	out : bytes = xor(xor(out,ROPc), c1)
+	out : bytes = xor(out, ROPc, c1)
 	return xor(OPc, Ek(K, out))[:8]
 
 

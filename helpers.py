@@ -68,11 +68,56 @@ def WIP_xor(*args: bytes) -> bytes:
 	for n in range(len(args)-1):
 		pass
 
-def xor(a: bytes, b: bytes) -> bytes:
+def works_xor(a: bytes, b: bytes) -> bytes:
 	assert(len(a) == len(b)), "Args bust be same length"
 	byte_arr: bytearray = bytearray(len(a))
 	for i in range(len(a)):
 		byte_arr[i] = a[i] ^ b[i]
+	return bytes(byte_arr)
+
+def xor(*args : bytes) -> bytes:
+	'''
+	Takes in any number of bytes objects and xors them, they must all be of the same length.
+	Returns a single bytes object that's the result of xoring all inputs
+	'''
+	assert(len(args) > 0), "xor must get at least 1 argument"
+	#Checks if all input arguments are the same length
+	args_len: int = len(args[0])
+	for arg in args:
+		if len(arg) != args_len:
+			raise ValueError
+	
+	#If there's only one argument, return that
+	if len(args) == 1:
+		return args[0]
+	
+	#If there's two arguments, xor those and return the result
+	elif len(args) == 2:
+		byte_arr: bytearray = bytearray(len(args[0]))
+		for i in range(len(args[0])):
+			byte_arr[i] = args[0][i] ^ args[1][i]
+		return bytes(byte_arr)
+
+	#If there are more than two arguments, split the args list into multiple
+	#smaller lists, and run this xor function on them recursivly
+	else:
+		args_left: list = args[0:int(len(args)/2)]
+		args_right: list = args[int(len(args)/2):]
+		left : bytes = xor(*args_left)
+		right : bytes = xor(*args_right)
+		return xor(left, right)
+			
+def xor2(*args: bytes):
+	assert(len(args) > 0), "xor must get at least 1 argument"
+	if len(args) == 1:
+		return args[0]
+	for i in range(len(args)):
+		if len(args[i]) != len(args[0]):
+			raise ValueError
+	byte_arr: bytearray = bytearray(len(args[0]))
+	for arg in args:
+		for i in range(len(arg)):
+			byte_arr[i] = byte_arr[i] ^ arg[i]
 	return bytes(byte_arr)
 
 
@@ -117,17 +162,20 @@ def create_c() -> tuple:
 	'''
 	Creates all 5 c constants and returns them as a tuple, needs to be unpacked
 	'''
-	base_str: str = ""
-	for i in range(128):
-		base_str += "0"
+	base_array: bytearray = bytearray(16)
+	c1 = base_array.copy()
 
-	c1: bytes = bit_str_to_bytes(base_str)
-	c2: bytes = bit_str_to_bytes(change_char(base_str, "1", 127))
-	c3: bytes = bit_str_to_bytes(change_char(base_str, "1", 126))
-	c4: bytes = bit_str_to_bytes(change_char(base_str, "1", 125))
-	c5: bytes = bit_str_to_bytes(change_char(base_str, "1", 124))
+	c2 = base_array.copy()
+	c2[15] = 1
 
-	c1 = b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+	c3 = base_array.copy()
+	c3[15] = 2
+
+	c4 = base_array.copy()
+	c4[15] = 4
+
+	c5 = base_array.copy()
+	c5[15] = 8
 
 	return c1, c2, c3, c4, c5
 	
@@ -138,5 +186,10 @@ def create_c() -> tuple:
 #For testing that the functions work
 if __name__ == '__main__':
 	bits: bytes = b"1234567890123456"
-	print(b2a(b"aaaaaaaaaaaaaaaa"))
+	#print(xor(b"\x01", b"\x01", b"\x10", b"\x10"))
+	inputs: tuple = (b"afdefgju", b"oangosyq", b"agmkyhlo", b"12f34567", b"24681357",)
+	print(xor(*inputs))
+	print(xor2(*inputs))
+
+	#print(create_c())
 	
