@@ -6,7 +6,7 @@ def rot(x: bytes|bytearray, r: int, right: bool = True) -> bytes:
 	'''
 	bytearr: bytearray = bytearray(x)
 	assert(r % 8 == 0)
-	rot_amount = r/8
+	rot_amount : int = int(r/8)
 	if right:
 		for i in range(rot_amount):
 			bytearr.insert(0, bytearr.pop(-1))
@@ -34,7 +34,6 @@ def b2a(b: bytes) -> str:
 	'''
 	Bytes to ascii. For 16 bytes objects only
 	'''
-	print(len(b))
 	assert len(b) == 16
 	tmp = list()
 	for i in range(len(b)):
@@ -51,7 +50,7 @@ def old_xor(a: bytes, b: bytes) -> bytes:
     '''
     return int.to_bytes(int.from_bytes(a)^int.from_bytes(b))
 
-def xor(*args: bytes) -> bytes:
+def old_too_xor(*args: bytes) -> bytes:
     '''
     Takes in any number of arguments (at least 1) and xors each of them.
     Works by first converting them to integers, xoring the integers, then returning bytes
@@ -61,6 +60,21 @@ def xor(*args: bytes) -> bytes:
     for arg in args:
         bin_int = bin_int ^ int.from_bytes(arg)
     return int.to_bytes(bin_int)
+
+def WIP_xor(*args: bytes) -> bytes:
+	assert(len(args) > 0), "xor must get at least 1 argument"
+	if len(args) == 1:
+		return args[0]
+	for n in range(len(args)-1):
+		pass
+
+def xor(a: bytes, b: bytes) -> bytes:
+	assert(len(a) == len(b)), "Args bust be same length"
+	byte_arr: bytearray = bytearray(len(a))
+	for i in range(len(a)):
+		byte_arr[i] = a[i] ^ b[i]
+	return bytes(byte_arr)
+
 
 def change_char(string: str, char: str, index: int) -> str:
     '''
@@ -112,6 +126,8 @@ def create_c() -> tuple:
 	c3: bytes = bit_str_to_bytes(change_char(base_str, "1", 126))
 	c4: bytes = bit_str_to_bytes(change_char(base_str, "1", 125))
 	c5: bytes = bit_str_to_bytes(change_char(base_str, "1", 124))
+
+	c1 = b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 
 	return c1, c2, c3, c4, c5
 	

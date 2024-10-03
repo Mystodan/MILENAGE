@@ -1,11 +1,16 @@
 from helpers import *
 import testdata as td
+from Crypto.Cipher import AES
+from Crypto import Random
+
+
+
 
 
 '''
 	List of Symbols:
 	= 			The Assignment operator
-	*			The bitwise exclusive-OR operation.
+	^ / *			The bitwise exclusive-OR operation.
 	||			The concatenation of the two operands. (+ should also work)
 	E[x]k		The Result of applying a block cipher encryption to the input value x using the key k
 	rot(x,r) 	The result of cyclically rotating the 128-bit value x by r bit positions towards the most significant bit.
@@ -31,8 +36,11 @@ import testdata as td
 	TEMP	a	128-bit value used in the computations of the functions
 '''
 
-def Ek():
-	pass
+def Ek(key, plaintext):
+	assert(len(plaintext) == 16)
+	aes = AES.new(key, AES.MODE_ECB)
+	return aes.encrypt(plaintext)
+
 
 def f1(K: bytes, RAND: bytes, SQN: bytes, AMF: bytes):	#Returns MAC-A (64-bits)
 	'''
@@ -43,7 +51,11 @@ def f1(K: bytes, RAND: bytes, SQN: bytes, AMF: bytes):	#Returns MAC-A (64-bits)
 	---
 	returns MAC-A: 64-bit network authentication code
 	'''
-	pass
+	ROPc : bytes = Ek(K, xor(OPc, RAND))
+	out : bytes = SQN + AMF + SQN + AMF
+	out : bytes = rot(xor(OPc, out), r1)
+	out : bytes = xor(xor(out,ROPc), c1)
+	return xor(OPc, Ek(K, out))[:8]
 
 
 def f2(K: bytes, RAND: bytes):	#Returns RES (64-bits)
@@ -86,7 +98,16 @@ def f5(K: bytes, RAND: bytes):	#Returns AK (48-bits)
 	pass
 
 
-def main() -> None:
+
+
+
+
+		
+	
+
+
+
+if __name__ == "__main__":
 	test_data: dict = td.load_data(1)
 	#Define input variables for f1, f2, f3, f4, and f5
 	K: bytes = test_data['K']
@@ -114,6 +135,5 @@ def main() -> None:
 
 	c1, c2, c3, c4, c5 = create_c()
 
-
-if __name__ == "__main__":
-	main()
+	print(f"f1:		{f1(K, RAND, SQN, AMF)}\nexpected f1:	{ex_out_f1}")
+	print(f"f1 gives expected output: {f1(K, RAND, SQN, AMF) == ex_out_f1}")
