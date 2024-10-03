@@ -75,7 +75,7 @@ def works_xor(a: bytes, b: bytes) -> bytes:
 		byte_arr[i] = a[i] ^ b[i]
 	return bytes(byte_arr)
 
-def xor(*args : bytes) -> bytes:
+def xor_recursive(*args : bytes) -> bytes:
 	'''
 	Takes in any number of bytes objects and xors them, they must all be of the same length.
 	Returns a single bytes object that's the result of xoring all inputs
@@ -103,11 +103,11 @@ def xor(*args : bytes) -> bytes:
 	else:
 		args_left: list = args[0:int(len(args)/2)]
 		args_right: list = args[int(len(args)/2):]
-		left : bytes = xor(*args_left)
-		right : bytes = xor(*args_right)
-		return xor(left, right)
+		left : bytes = xor_recursive(*args_left)
+		right : bytes = xor_recursive(*args_right)
+		return xor_recursive(left, right)
 			
-def xor2(*args: bytes):
+def xor(*args: bytes):
 	assert(len(args) > 0), "xor must get at least 1 argument"
 	if len(args) == 1:
 		return args[0]
@@ -188,8 +188,8 @@ if __name__ == '__main__':
 	bits: bytes = b"1234567890123456"
 	#print(xor(b"\x01", b"\x01", b"\x10", b"\x10"))
 	inputs: tuple = (b"afdefgju", b"oangosyq", b"agmkyhlo", b"12f34567", b"24681357",)
+	print(xor_recursive(*inputs))
 	print(xor(*inputs))
-	print(xor2(*inputs))
 
 	#print(create_c())
 	

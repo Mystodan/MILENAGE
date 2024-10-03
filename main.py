@@ -1,10 +1,6 @@
 from helpers import *
 import testdata as td
 from Crypto.Cipher import AES
-from Crypto import Random
-
-
-
 
 
 '''
@@ -36,10 +32,10 @@ from Crypto import Random
 	TEMP	a	128-bit value used in the computations of the functions
 '''
 
-def Ek(key, plaintext):
-	assert(len(plaintext) == 16)
+def Ek(key, m):
+	assert(len(m) == 16)
 	aes = AES.new(key, AES.MODE_ECB)
-	return aes.encrypt(plaintext)
+	return aes.encrypt(m)
 
 
 def f1(K: bytes, RAND: bytes, SQN: bytes, AMF: bytes):	#Returns MAC-A (64-bits)
@@ -51,7 +47,7 @@ def f1(K: bytes, RAND: bytes, SQN: bytes, AMF: bytes):	#Returns MAC-A (64-bits)
 	---
 	returns MAC-A: 64-bit network authentication code
 	'''
-	ROPc : bytes = Ek(K, xor(OPc, RAND))
+	
 	out : bytes = SQN + AMF + SQN + AMF
 	out : bytes = rot(xor(OPc, out), r1)
 	out : bytes = xor(out, ROPc, c1)
@@ -65,7 +61,10 @@ def f2(K: bytes, RAND: bytes):	#Returns RES (64-bits)
 	---
 	returns RES: 64-bit signed response
 	'''
-	pass
+	out = rot(xor(ROPc, OPc), r2)
+	out = Ek(K, (xor(out, c2)))
+	out = xor(out, OPc)
+	return out[8:]
 
 
 def f3(K: bytes, RAND: bytes):	#Returns CK (128-bits)
@@ -95,15 +94,10 @@ def f5(K: bytes, RAND: bytes):	#Returns AK (48-bits)
 	---
 	returns AK: 48-bit anonymity key
 	'''
-	pass
-
-
-
-
-
-
-		
-	
+	out = rot(xor(ROPc, OPc), r2)
+	out = Ek(K, (xor(out, c2)))
+	out = xor(out, OPc)
+	return out[:6]
 
 
 
@@ -118,6 +112,7 @@ if __name__ == "__main__":
 	#Other variables
 	OP: bytes = test_data['OP']
 	OPc: bytes = test_data['OPc']
+	ROPc : bytes = Ek(K, xor(OPc, RAND))
 
 	#Define expected outputs
 	ex_out_f1: bytes = test_data['f1']
@@ -137,3 +132,5 @@ if __name__ == "__main__":
 
 	print(f"f1:		{f1(K, RAND, SQN, AMF)}\nexpected f1:	{ex_out_f1}")
 	print(f"f1 gives expected output: {f1(K, RAND, SQN, AMF) == ex_out_f1}")
+	print(f"f2:		{f2(K, RAND)}\nexpected f2:	{ex_out_f2}")
+	print(f"f5:		{f5(K, RAND)}\nexpected f5:	{ex_out_f5}")
