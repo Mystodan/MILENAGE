@@ -1,4 +1,18 @@
+'''
+	Author: Group \x01
+	---
+	This file contains the f1 -> f5 functions for MILENAGE and some helper functions
+	to eliminate some duplicate code and improve readability. This file does not include
+	functions to generate RAND, K, SQN, AMF, and OP and they will need to be supplemented
+	\n\n
+	Creating a single milenage() function would improve performance as some of the values
+	used are the same in all funcitons. f2 and f5 are both derrived from OUT2 aswell.
+	---
+	The functions have all been tested against the KATs described in 3GPP TS 35.208
+'''
+
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
 
 def xor(*args: bytes):
 	'''
@@ -155,13 +169,8 @@ def f5(K: bytes, RAND: bytes, OP: bytes):	#Returns AK (48-bits)
 	OPc: bytes = xor(OP, Ek(K, OP)) 		#OPc = OP ⊕ E[OP]k
 	TEMP : bytes = Ek(K, xor(RAND, OPc)) 	#TEMP = E[RAND ⊕ OPC]k
 
-	#Step by step computation of OUT1 as described in 3GPP TS 35.206
 	#OUT2 = E[rot(TEMP ⊕ OPC, r2) ⊕ c2]K ⊕ OPC
-	OUT2 : bytes = xor(TEMP, OPc)
-	OUT2 : bytes = rot(OUT2, r2)
-	OUT2 : bytes = xor(OUT2, c2)
-	OUT2 : bytes = Ek(K, OUT2)
-	OUT2 : bytes = xor(OUT2, OPc)
+	OUT2 : bytes = xor(Ek(K, xor(rot(xor(TEMP, OPc), r2), c2)), OPc)
 	return OUT2[:6] #f5 is defined as the first 48bits (8bytes) of OUT2, f2 is defined as the last 64bits of OUT2
 
 

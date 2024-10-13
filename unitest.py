@@ -1,7 +1,8 @@
 import unittest
 from oblig1 import *
 
-kats: list[dict[str:str]] = [
+
+kats : list[dict[str:str]] = [
     {
         "K": "465b5ce8b199b49faa5f0a2ee238a6bc",
         "RAND": "23553cbe9637a89d218ae64dae47bf35",
@@ -324,8 +325,10 @@ class MilenageTest(unittest.TestCase):
                     self.assertEqual(test_milenage, expected_milenages[kvp])
 
 
-# When this file is run, test all the CATs using the f1 -> f5 functions from the main code file.
+# When this file is run, test all the KATs using the f1 -> f5 functions from the main code file.
 # The cats list store all values in hex, so they need to be converted to bytes before being input
 # into any function using the bytes.fromhex() method
-if __name__ == "__main__":
-    unittest.main()
+
+if __name__ == '__main__':
+	unittest.main()
+
