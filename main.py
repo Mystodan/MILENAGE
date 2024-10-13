@@ -32,7 +32,7 @@ from Crypto.Cipher import AES
 	TEMP	a	128-bit value used in the computations of the functions
 '''
 
-def Ek(key, m):
+def Ek(key: bytes, m: bytes):
 	assert(len(m) == 16)
 	aes = AES.new(key, AES.MODE_ECB)
 	return aes.encrypt(m)
