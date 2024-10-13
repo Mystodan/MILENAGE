@@ -1,6 +1,7 @@
+import unittest
 from oblig1 import *
 
-cats : list[dict[str:str]] = [
+kats: list[dict[str:str]] = [
     {
         "K": "465b5ce8b199b49faa5f0a2ee238a6bc",
         "RAND": "23553cbe9637a89d218ae64dae47bf35",
@@ -288,40 +289,43 @@ cats : list[dict[str:str]] = [
     },
 ]
 
-#When this file is run, test all the CATs using the f1 -> f5 functions from the main code file.
-#The cats list store all values in hex, so they need to be converted to bytes before being input 
+
+class MilenageTest(unittest.TestCase):
+    """Testing class made to test every helper function for milenage"""
+
+    def test_milenage_kat(self):
+        """
+        Tests f1, f2, f3, f4, f5
+        """
+        for i, test_set in enumerate(kats):
+            K = bytes.fromhex(test_set["K"])
+            RAND = bytes.fromhex(test_set["RAND"])
+            SQN = bytes.fromhex(test_set["SQN"])
+            AMF = bytes.fromhex(test_set["AMF"])
+            OP = bytes.fromhex(test_set["OP"])
+
+            expected_milenages = {
+                "f1": bytes.fromhex(test_set["f1"]),
+                "f2": bytes.fromhex(test_set["f2"]),
+                "f3": bytes.fromhex(test_set["f3"]),
+                "f4": bytes.fromhex(test_set["f4"]),
+                "f5": bytes.fromhex(test_set["f5"]),
+            }
+
+            test_milenages = {
+                "f1": f1(K, RAND, SQN, AMF, OP),
+                "f2": f2(K, RAND, OP),
+                "f3": f3(K, RAND, OP),
+                "f4": f4(K, RAND, OP),
+                "f5": f5(K, RAND, OP),
+            }
+            with self.subTest(i=i):
+                for kvp, test_milenage in test_milenages.items():
+                    self.assertEqual(test_milenage, expected_milenages[kvp])
+
+
+# When this file is run, test all the CATs using the f1 -> f5 functions from the main code file.
+# The cats list store all values in hex, so they need to be converted to bytes before being input
 # into any function using the bytes.fromhex() method
-if __name__ == '__main__':
-	for i, test_set in enumerate(cats):
-		K = bytes.fromhex(test_set['K'])
-		RAND = bytes.fromhex(test_set['RAND'])
-		SQN = bytes.fromhex(test_set['SQN'])
-		AMF = bytes.fromhex(test_set['AMF'])
-		OP = bytes.fromhex(test_set['OP'])
-
-		expected_f1 = bytes.fromhex(test_set['f1'])
-		expected_f2 = bytes.fromhex(test_set['f2'])
-		expected_f3 = bytes.fromhex(test_set['f3'])
-		expected_f4 = bytes.fromhex(test_set['f4'])
-		expected_f5 = bytes.fromhex(test_set['f5'])
-
-		success: bool = True
-		if f1(K, RAND, SQN, AMF, OP) != expected_f1:
-			success = False
-			print(f"Test set {i} f1 failed - Got {f1(K, RAND, SQN, AMF, OP)}, but expected {expected_f1}")
-		if f2(K, RAND, OP) != expected_f2:
-			success = False
-			print(f"Test set {i} f2 failed - Got {f2(K, RAND, OP)}, but expected {expected_f2}")
-		if f3(K, RAND, OP) != expected_f3:
-			success = False
-			print(f"Test set {i} f3 failed - Got {f3(K, RAND, OP)}, but expected {expected_f3}")
-		if f4(K, RAND, OP) != expected_f4:
-			success = False
-			print(f"Test set {i} f4 failed - Got {f4(K, RAND, OP)}, but expected {expected_f4}")
-		if f5(K, RAND, OP) != expected_f5:
-			success = False
-			print(f"Test set {i} f5 failed - Got {f5(K, RAND, OP)}, but expected {expected_f5}")
-
-		if success:
-			print(f"Test set {i+1} passed")
-
+if __name__ == "__main__":
+    unittest.main()
