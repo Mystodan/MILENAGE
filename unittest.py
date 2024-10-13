@@ -1,6 +1,5 @@
 from oblig1 import *
 
-
 cats : list[dict[str:str]] = [
     {
         "K": "465b5ce8b199b49faa5f0a2ee238a6bc",

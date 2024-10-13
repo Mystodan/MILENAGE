@@ -1,5 +1,4 @@
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from testdata import load_data_from_pdf
 
 def xor(*args: bytes):
 	'''
@@ -36,7 +35,6 @@ def rot(x: bytes|bytearray, r: int, right: bool = False) -> bytes:
 			bytearr.append(bytearr.pop(0))
 	return bytes(bytearr)
 
-
 def Ek(key: bytes, m: bytes) -> bytes:
 	'''
 	Encrypts input m using a block chiper using the input key, returns encrypted block in bytes
@@ -64,18 +62,17 @@ def f1(K: bytes, RAND: bytes, SQN: bytes, AMF: bytes, OP: bytes):	#Returns MAC-A
 	OPc: bytes = xor(OP, Ek(K, OP)) 		#OPc = OP ⊕ E[OP]k
 	TEMP : bytes = Ek(K, xor(RAND, OPc)) 	#TEMP = E[RAND ⊕ OPC]k
 	
+	#Step by step computation of OUT1 as described in 3GPP TS 35.206
+	#OUT1 = E[TEMP ⊕ rot(IN1 ⊕ OPC, r1) ⊕ c1]K ⊕ OPC
 	IN1 : bytes = SQN + AMF + SQN + AMF
 	OUT1 : bytes = xor(OPc, IN1)
 	OUT1 : bytes = rot(OUT1, r1)
 	OUT1 : bytes = xor(OUT1, TEMP, c1)
+	OUT1 : bytes = Ek(K, OUT1)
+	OUT1 : bytes = xor(OPc, OUT1)
+
+	return OUT1[:8] #f1 is defined as the first 64bits (8bytes) of OUT1, f1* is the remaining 64bits
 	
-
-
-	""" out : bytes = rot(xor(OPc, IN1), r1)
-	out : bytes = xor(out, TEMP, c1)
-	return xor(OPc, Ek(K, out))[:8]
- """
-
 def f2(K: bytes, RAND: bytes, OP: bytes):	#Returns RES (64-bits)
 	'''
 	K: 128-bit subscriber key \n
@@ -84,19 +81,23 @@ def f2(K: bytes, RAND: bytes, OP: bytes):	#Returns RES (64-bits)
 	returns RES: 64-bit signed response
 	'''
 	#Define constants
-	OPc: bytes = xor(OP, Ek(K, OP))
-	TEMP : bytes = Ek(K, xor(RAND, OPc))
-
 	r2: int = 0
 	c2: bytearray = bytearray(16)
 	c2[15] = 1
 
-	out = rot(xor(TEMP, OPc), r2)
-	out = Ek(K, (xor(out, c2)))
-	out = xor(out, OPc)
-	return out[8:]
+	#Compute OPc and TEMP as described in 3GPP TS 35.206
+	OPc: bytes = xor(OP, Ek(K, OP)) 		#OPc = OP ⊕ E[OP]k
+	TEMP : bytes = Ek(K, xor(RAND, OPc)) 	#TEMP = E[RAND ⊕ OPC]k
 
-
+	#Step by step computation of OUT1 as described in 3GPP TS 35.206
+	#OUT2 = E[rot(TEMP ⊕ OPC, r2) ⊕ c2]K ⊕ OPC
+	OUT2 : bytes = xor(TEMP, OPc)
+	OUT2 : bytes = rot(OUT2, r2)
+	OUT2 : bytes = xor(OUT2, c2)
+	OUT2 : bytes = Ek(K, OUT2)
+	OUT2 : bytes = xor(OUT2, OPc)
+	return OUT2[8:] #f2 is defined as the last 64bits (8bytes) of OUT2, f5 is defined as the first 48 bits of OUT2
+	
 def f3(K: bytes, RAND: bytes, OP: bytes):	#Returns CK (128-bits)
 	'''
 	K: 128-bit subscriber key \n
@@ -109,11 +110,14 @@ def f3(K: bytes, RAND: bytes, OP: bytes):	#Returns CK (128-bits)
 	c3: bytearray = bytearray(16)
 	c3[15] = 2
 
-	OPc: bytes = xor(OP, Ek(K, OP))
-	TEMP : bytes = Ek(K, xor(RAND, OPc))
+	#Compute OPc and TEMP as described in 3GPP TS 35.206
+	OPc: bytes = xor(OP, Ek(K, OP)) 		#OPc = OP ⊕ E[OP]k
+	TEMP : bytes = Ek(K, xor(RAND, OPc)) 	#TEMP = E[RAND ⊕ OPC]k
 
-	return xor(Ek(K, xor(rot(xor(TEMP, OPc), r3), c3)), OPc)
-
+	#OUT3, OUT4, and OUT5 are all computed in the same way as OUT2, except using their appropreate r's and c's
+	#OUT3 can be computed in one line like this
+	OUT3 : bytes = xor(Ek(K, xor(rot(xor(TEMP, OPc), r3), c3)), OPc)	#OUT3 = E[rot(TEMP ⊕ OPC, r3) ⊕ c3]K ⊕ OPC
+	return OUT3 #f3 is defined as all 128 bits of OUT3
 
 def f4(K: bytes, RAND: bytes, OP: bytes):	#Returns IK (128-bits)
 	'''
@@ -127,11 +131,14 @@ def f4(K: bytes, RAND: bytes, OP: bytes):	#Returns IK (128-bits)
 	c4: bytearray = bytearray(16)
 	c4[15] = 4
 
-	OPc: bytes = xor(OP, Ek(K, OP))
-	TEMP : bytes = Ek(K, xor(RAND, OPc))
+	#Compute OPc and TEMP as described in 3GPP TS 35.206
+	OPc: bytes = xor(OP, Ek(K, OP)) 		#OPc = OP ⊕ E[OP]k
+	TEMP : bytes = Ek(K, xor(RAND, OPc)) 	#TEMP = E[RAND ⊕ OPC]k
 	
-	return xor(Ek(K, xor(rot(xor(TEMP, OPc), r4), c4)), OPc)
-
+	#OUT3, OUT4, and OUT5 are all computed in the same way as OUT2, except using their appropreate r's and c's
+	#OUT4 can be computed in one line like this
+	OUT4 : bytes = xor(Ek(K, xor(rot(xor(TEMP, OPc), r4), c4)), OPc)	#OUT4 = E[rot(TEMP ⊕ OPC, r4) ⊕ c4]K ⊕ OPC
+	return OUT4 #f4 is defined as all 128 bits of OUT4
 
 def f5(K: bytes, RAND: bytes, OP: bytes):	#Returns AK (48-bits)
 	'''
@@ -144,12 +151,17 @@ def f5(K: bytes, RAND: bytes, OP: bytes):	#Returns AK (48-bits)
 	c2: bytearray = bytearray(16)
 	c2[15] = 1
 
-	OPc: bytes = xor(OP, Ek(K, OP))
-	TEMP : bytes = Ek(K, xor(RAND, OPc))
-	out = rot(xor(TEMP, OPc), r2)
-	out = Ek(K, (xor(out, c2)))
-	out = xor(out, OPc)
-	return out[:6]
+	#Compute OPc and TEMP as described in 3GPP TS 35.206
+	OPc: bytes = xor(OP, Ek(K, OP)) 		#OPc = OP ⊕ E[OP]k
+	TEMP : bytes = Ek(K, xor(RAND, OPc)) 	#TEMP = E[RAND ⊕ OPC]k
 
+	#Step by step computation of OUT1 as described in 3GPP TS 35.206
+	#OUT2 = E[rot(TEMP ⊕ OPC, r2) ⊕ c2]K ⊕ OPC
+	OUT2 : bytes = xor(TEMP, OPc)
+	OUT2 : bytes = rot(OUT2, r2)
+	OUT2 : bytes = xor(OUT2, c2)
+	OUT2 : bytes = Ek(K, OUT2)
+	OUT2 : bytes = xor(OUT2, OPc)
+	return OUT2[:6] #f5 is defined as the first 48bits (8bytes) of OUT2, f2 is defined as the last 64bits of OUT2
 
 
