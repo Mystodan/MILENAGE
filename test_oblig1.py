@@ -338,7 +338,7 @@ class MilenageTest(unittest.TestCase):
 
     def test_f2(self):
         """
-        Tests our f1 function against expected f2 from the kats list
+        Tests our f2 function against expected f2 from the kats list
         """
         for i, test_set in enumerate(kats):
             tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F2)
@@ -347,7 +347,7 @@ class MilenageTest(unittest.TestCase):
 
     def test_f3(self):
         """
-        Tests our f1 function against expected f3 from the kats list
+        Tests our f3 function against expected f3 from the kats list
         """
         for i, test_set in enumerate(kats):
             tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F3)
@@ -356,7 +356,7 @@ class MilenageTest(unittest.TestCase):
 
     def test_f4(self):
         """
-        Tests our f1 function against expected f4 from the kats list
+        Tests our f4 function against expected f4 from the kats list
         """
         for i, test_set in enumerate(kats):
             tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F4)
@@ -365,7 +365,7 @@ class MilenageTest(unittest.TestCase):
 
     def test_f5(self):
         """
-        Tests our f1 function against expected f5 from the kats list
+        Tests our f5 function against expected f5 from the kats list
         """
         for i, test_set in enumerate(kats):
             tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F5)
