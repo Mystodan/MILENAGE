@@ -1,6 +1,7 @@
+# oblig1.py
 import unittest
 from oblig1 import *
-
+from enum import Enum
 
 kats : list[dict[str:str]] = [
     {
@@ -293,40 +294,91 @@ kats : list[dict[str:str]] = [
 
 class MilenageTest(unittest.TestCase):
     """Testing class made to test every helper function for milenage"""
+    class helper_function(Enum):
+         F1=0
+         F2=1
+         F3=2
+         F4=3
+         F5=4
 
-    def test_milenage_kat(self):
-        """
-        Tests f1, f2, f3, f4, f5
-        """
-        for i, test_set in enumerate(kats):
+    def get_compare_data(self,test_set, set:helper_function):
             K = bytes.fromhex(test_set["K"])
             RAND = bytes.fromhex(test_set["RAND"])
             SQN = bytes.fromhex(test_set["SQN"])
             AMF = bytes.fromhex(test_set["AMF"])
             OP = bytes.fromhex(test_set["OP"])
-
-            expected_milenages = {
-                "f1": bytes.fromhex(test_set["f1"]),
-                "f2": bytes.fromhex(test_set["f2"]),
-                "f3": bytes.fromhex(test_set["f3"]),
-                "f4": bytes.fromhex(test_set["f4"]),
-                "f5": bytes.fromhex(test_set["f5"]),
+            hp = self.helper_function
+        
+            expected_kats = { # gets the expected data from the kats list
+                hp.F1: bytes.fromhex(test_set["f1"]),
+                hp.F2: bytes.fromhex(test_set["f2"]),
+                hp.F3: bytes.fromhex(test_set["f3"]),
+                hp.F4: bytes.fromhex(test_set["f4"]),
+                hp.F5: bytes.fromhex(test_set["f5"]),
             }
 
-            test_milenages = {
-                "f1": f1(K, RAND, SQN, AMF, OP),
-                "f2": f2(K, RAND, OP),
-                "f3": f3(K, RAND, OP),
-                "f4": f4(K, RAND, OP),
-                "f5": f5(K, RAND, OP),
+            testing_kats = { # computes results from functions f1, f2, f3, f4, f5
+                hp.F1: f1(K, RAND, SQN, AMF, OP),
+                hp.F2: f2(K, RAND, OP),
+                hp.F3: f3(K, RAND, OP),
+                hp.F4: f4(K, RAND, OP),
+                hp.F5: f5(K, RAND, OP),
             }
+            return testing_kats[set], expected_kats[set] # returns the computed and expected results
+
+
+    def test_f1(self):
+        """
+        Tests our f1 function against expected f1 from the kats list
+        """
+        for i, test_set in enumerate(kats):
+            tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F1)
             with self.subTest(i=i):
-                for kvp, test_milenage in test_milenages.items():
-                    self.assertEqual(test_milenage, expected_milenages[kvp])
+                self.assertEqual(tested_result, expected_result)
+
+    def test_f2(self):
+        """
+        Tests our f1 function against expected f2 from the kats list
+        """
+        for i, test_set in enumerate(kats):
+            tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F2)
+            with self.subTest(i=i):
+                self.assertEqual(tested_result, expected_result)
+
+    def test_f3(self):
+        """
+        Tests our f1 function against expected f3 from the kats list
+        """
+        for i, test_set in enumerate(kats):
+            tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F3)
+            with self.subTest(i=i):
+                self.assertEqual(tested_result, expected_result)
+
+    def test_f4(self):
+        """
+        Tests our f1 function against expected f4 from the kats list
+        """
+        for i, test_set in enumerate(kats):
+            tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F4)
+            with self.subTest(i=i):
+                self.assertEqual(tested_result, expected_result)
+
+    def test_f5(self):
+        """
+        Tests our f1 function against expected f5 from the kats list
+        """
+        for i, test_set in enumerate(kats):
+            tested_result, expected_result = self.get_compare_data(test_set, self.helper_function.F5)
+            with self.subTest(i=i):
+                self.assertEqual(tested_result, expected_result)
+
+
+
+         
 
 
 # When this file is run, test all the KATs using the f1 -> f5 functions from the main code file.
-# The cats list store all values in hex, so they need to be converted to bytes before being input
+# The kats list store all values in hex, so they need to be converted to bytes before being input
 # into any function using the bytes.fromhex() method
 
 if __name__ == '__main__':
