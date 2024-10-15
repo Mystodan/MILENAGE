@@ -1,5 +1,6 @@
 # Group Assignment 1 - Milenage Implementasjon
 Av: Christoffer Simonsen, Daniel Hao Huynh, Mikael Fossli <br>
+[Milenage Implementation](https://github.com/Exzircon/MILENAGE/blob/Ref-deliver/oblig1.py) <br>
 [Proof of work](https://github.com/Exzircon/MILENAGE/blob/Ref-deliver/Proof%20of%20work.pdf) <br>
 [Merkle trær](https://github.com/Exzircon/MILENAGE/blob/Ref-deliver/merkle%20tr%C3%A6r.pdf)
 
