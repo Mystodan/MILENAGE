@@ -6,6 +6,19 @@ Av: Christoffer Simonsen, Daniel Hao Huynh, Mikael Fossli <br>
 
 Dette er vår implementasjon av Milenage, 3GPP autentisering- og nøkkelgenererings- funksjoner. Milenage er basert på AES (Rjindael) og vi har følgt 3GPP- TS 35.205 - 35.208 og TR 35.909
 
+### Oppsett av prosjekt
+1. sett opp virtuell miljø:
+- https://docs.python.org/3/library/venv.html
+2. aktiver miljø
+- ```sh
+  .\.venv\Scripts\activate
+  ``` 
+3. hent nødvendige moduler:
+- ```sh
+  pip install -r .\requirements.txt
+  ```
+
+
 ### Test resultater
 Alle tester bestått etter spesifikasjoner
   - f0 – pseudo-random funksjon (128-bit nummer)
